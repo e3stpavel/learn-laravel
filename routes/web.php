@@ -13,13 +13,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-/*Route::get('/', [\App\Http\Controllers\HomeController::class, 'index']);
-Route::get('/posts', [\App\Http\Controllers\HomeController::class, 'posts']);
-Route::get('/posts/{post}', [\App\Http\Controllers\HomeController::class, 'post'])->whereNumber('post')->name('post');
-Route::get('/admin/posts', [\App\Http\Controllers\PostController::class, 'index']);
-Route::get('/admin/posts/create', [\App\Http\Controllers\PostController::class, 'create']);
-Route::post('/admin/posts', [\App\Http\Controllers\PostController::class, 'store']);*/
-
 Route::get('/', [\App\Http\Controllers\HomeController::class, 'index']);
 Route::get('/posts', [\App\Http\Controllers\HomeController::class, 'posts']);
 Route::get('/posts/{post}', [\App\Http\Controllers\HomeController::class, 'post'])->whereNumber('post')->name('post');
