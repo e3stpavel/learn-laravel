@@ -1,7 +1,7 @@
 @extends('layout')
 @section('title', 'Posts')
 @section('content')
-    <a href="/admin/posts/create" class="btn btn-primary">New Post</a>
+    <a href="{{route('posts.create')}}" class="btn btn-primary">New Post</a>
     {{$posts->links()}}
     <table class="table table-striped">
         <thead>
@@ -15,16 +15,19 @@
             @foreach($posts as $post)
                 <tr>
                     <td>{{$post->id}}</td>
-                    <td>{{$post->title}}</td>
-                    <td>{{$post->created_at}}</td>
-                    <td>{{$post->updated_at}}</td>
                     <td>
-                        <form method="POST" action="{{route('posts.destroy', ['post'=> $post->id])}}">
+                        <h4 style="font-size: 1.7rem">{{$post->title}}</h4>
+                        <p class="text-muted"> - by {{$post->user->name}}</p>
+                    </td>
+                    <td>{{$post->created_at->setTimezone('Europe/Tallinn')}}</td>
+                    <td>{{$post->updated_at->setTimezone('Europe/Tallinn')}}</td>
+                    <td style="vertical-align: middle">
+                        <form action="{{route('posts.destroy', ['post' => $post->id])}}" method="POST">
                             @method('DELETE')
                             @csrf
-                            <a class="btn btn-dark" href="{{route('posts.show', ['post'=>$post->id])}}">View</a>
-                            <a class="btn btn-warning" href="{{route('posts.edit', ['post'=>$post->id])}}">Edit</a>
-                            <input class="btn btn-danger" onclick="return confirm('Are you sure?')" type="submit" value="Delete">
+                            <a href="/admin/posts/{{$post->id}}" class="btn btn-dark">View</a>
+                            <a href="{{route('posts.edit', ['post' => $post->id])}}" class="btn btn-warning">Edit</a>
+                            <input type="submit" value="Delete" class="btn btn-danger" style="margin-top: .5em; width: 8.7em">
                         </form>
                     </td>
                 </tr>

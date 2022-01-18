@@ -1,0 +1,77 @@
+// Fonts
+@import url('https://fonts.googleapis.com/css?family=Nunito');
+
+// Variables
+@import 'variables';
+
+// Bootstrap
+@import '~bootstrap/scss/bootstrap';
+
+body {
+    /*font-family: "Averta CY",sans-serif;
+    letter-spacing: -.05em;
+    line-height: 47px;*/
+
+    .logo {
+        font-weight: 600;
+    }
+    .head-container {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+
+        .head-container-inner {
+            display: flex;
+            flex-direction: column;
+            width: 70%;
+
+            h1 {
+                font-size: 3.5em
+            }
+            span {
+                font-size: 1.3em;
+                color: #6b7280;
+            }
+        }
+
+        .round-profile {
+            border-radius: 50%;
+            background: rgb(133,133,133);
+            width: 10em;
+            height: 10em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+    }
+
+    .counters {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        margin-top: 5em;
+        padding: 0 var(--bs-gutter-x,.75rem);
+
+        .cntr-container {
+            width: 15em;
+            height: 15em;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #86c2fc;
+            border-radius: 15px;
+
+            .count {
+                font-size: 3em;
+                font-weight: bold;
+            }
+            .sign {
+                font-size: 1em;
+                text-align: center;
+            }
+        }
+    }
+}

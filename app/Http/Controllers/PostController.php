@@ -2,13 +2,31 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\EditPostRequest;
-use App\Http\Requests\StorePostRequest;
+use App\Http\Middleware\UserOwnsPost;
+use App\Http\Requests\CreatePostRequest;
+use App\Models\Image;
 use App\Models\Post;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class PostController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(UserOwnsPost::class)->except(['index', 'create', 'store', 'posts']);
+    }
+
+    /**
+     * getting posts via api
+     *
+     */
+    public function posts()
+    {
+        return Post::with(['images'])->inRandomOrder()->take(20)->get();
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -17,7 +35,8 @@ class PostController extends Controller
     public function index()
     {
         //
-        $posts = Post::paginate();
+        //dd(Auth::user()->posts()->where('title', 'LIKE', 'A%')->get());
+        $posts = Auth::user()->posts()->paginate();
         //dump($posts->toArray());
         return response()->view('posts.index', compact('posts'));
     }
@@ -39,13 +58,22 @@ class PostController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StorePostRequest $request)
+    public function store(CreatePostRequest $request)
     {
         //
-        $post = new Post();
-        $post->title = $request->input('title');
-        $post->body = $request->input('body');
+        $post = new Post($request->validated());
+        $post->user_id = Auth::user()->id;
+        //$post->title = $request->input('title', '');
+        //$post->body = $request->input('body', '');
         $post->save();
+
+        foreach ($request->validated()['image'] as $image) {
+            $path = $image->store('public');
+            $image = new Image();
+            $image->path = Storage::url($path);
+            $post->images()->save($image);
+        }
+
         return response()->redirectTo('/admin/posts');
     }
 
@@ -80,14 +108,16 @@ class PostController extends Controller
      * @param  \App\Models\Post  $post
      * @return \Illuminate\Http\Response
      */
-    public function update(EditPostRequest $request, Post $post)
+    public function update(CreatePostRequest $request, Post $post)
     {
         //
-        $post->title = $request->input('title');
-        $post->body = $request->input('body');
+        //$post->title = $request->input('title', '');
+        //$post->body = $request->input('body', '');
+
+        $post->fill($request->validated());
+
         $post->save();
         return response()->redirectTo('/admin/posts');
-        //return response()->redirectTo(url()->previous());
     }
 
     /**
@@ -100,6 +130,6 @@ class PostController extends Controller
     {
         //
         $post->delete();
-        return response()->redirectTo('/admin/posts');
+        return response()->redirectTo('admin/posts');
     }
 }

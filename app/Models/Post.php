@@ -4,20 +4,79 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 
 class Post extends Model
 {
     use HasFactory;
 
-    public function getTitleAttribute($value){
+    protected $fillable = ['title', 'body'];
+
+    /*public function getTitleAttribute($value){
         return ucfirst($value) . '.';
+    }*/
+
+    protected $with = ['user'];
+    protected $appends = ['snippet'];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 
-    public function getSnippetAttribute(){
-        return explode("<br><br>", $this->body)[0];
+    public function comments()
+    {
+        return $this->hasMany(Comment::class)->latest();
     }
 
-    public function getBodyAttribute($value){
-        return str_replace("\n\n", '<br><br>', $value);
+    public function images()
+    {
+        return $this->hasMany(Image::class);
+    }
+
+    public function likes()
+    {
+        return $this->hasMany(Like::class);
+    }
+
+    public function tags()
+    {
+        return $this->belongsToMany(Tag::class);
+    }
+
+    public function getAuthHasLikedAttribute()
+    {
+        if(auth()->check()) {
+            return $this->likes()->where('user_id', auth()->user()->id)->exists();
+        }
+        return false;
+    }
+
+    public function setImageAttribute(UploadedFile $image)
+    {
+        $path = $image->store('public');
+        $this->image_path = Storage::url($path);
+        //dd($this->image_path);
+    }
+
+    public function getSnippetAttribute()
+    {
+        return explode("\n\n", $this->body)[0];
+    }
+
+    public function getDisplayBodyAttribute()
+    {
+        //return str_replace("\n\n", '<br><br>', $this->body);
+        return nl2br($this->body);
+    }
+
+    protected static function booted()
+    {
+        static::deleted(function ($post)
+        {
+            File::delete(public_path($post->image_path));
+        });
     }
 }
