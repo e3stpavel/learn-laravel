@@ -82,7 +82,7 @@ class GetPic extends Command
 
         $body = $response->getBody()->getContents();
         echo "Request was made \n";
-        Cache::put($url, $body);
+        Cache::put($url, $body, 3600); // 1 hour
 
         return $body;
     }
